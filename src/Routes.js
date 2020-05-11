@@ -20,9 +20,11 @@ import some from 'lodash/some';
  */
 const SamplePage = asyncComponent(() => import(/* webpackChunkName: "SamplePage" */ './SmartComponents/SamplePage/SamplePage'));
 const Rules = asyncComponent(() => import(/* webpackChunkName: "Rules" */ './PresentationalComponents/Rules/ListRules'));
+const Connections = asyncComponent(() => import(/* webpackChunkName: "Connections" */ './SmartComponents/Connections/Connections'));
 const paths = {
     samplepage: '/samplepage',
-    rules: '/rules'
+    rules: '/rules',
+    connections: '/connections'
 };
 
 type Props = {
@@ -58,6 +60,7 @@ export const Routes = (props: Props) => {
         <Switch>
             <InsightsRoute path={ paths.samplepage } component={ SamplePage } rootClass='samplepage'/>
             <InsightsRoute path={ paths.rules } component={ Rules } rootClass='rules'/>
+            <InsightsRoute path={ paths.connections } component={ Connections } rootClass='connections'/>
 
             { /* Finally, catch all unmatched routes */ }
             <Route render={ () => some(paths, p => p === path) ? null : (<Redirect to={ paths.samplepage }/>) }/>
