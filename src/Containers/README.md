@@ -1,0 +1,1 @@
+Use this folder for components that call an API
