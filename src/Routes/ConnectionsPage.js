@@ -3,8 +3,6 @@ import { withRouter } from 'react-router-dom';
 
 import { Main, PageHeader, PageHeaderTitle } from '@redhat-cloud-services/frontend-components';
 
-// import ConnectionList from '../Containers/ConnectionList';
-
 import './ConnectionsPage.scss';
 import { ConnectionList } from '../Containers/ConnectionList';
 
