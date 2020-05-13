@@ -1,5 +1,3 @@
-// Pretend this calls an API to fetch this data
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,51 +7,35 @@ import {
     TableBody
 } from '@patternfly/react-table';
 
-const columns = [
-    'id',
-    'Name'
-];
-
-// For some reason if you want to use a tag inside of PF's table, you use "title"
-const rows = [
-    {
-        cells: [
-            { title: <Link to={ '/connections/sample-id' }> this is a sample id </Link> },
-            'Sample Title'
-        ]
-    },
-    {
-        cells: [
-            { title: <Link to={ '/connections/foo-bar' }> this is a foobar </Link> },
-            'Foo bar'
-        ]
-    }
-];
-
 export const ConnectionList = () => {
-    const [ connections, setConnections ] = useState([]);
+    const [ activeConnections, setActiveConnections ] = useState([{
+        account: '',
+        connections: []
+    }]);
 
-    useEffect(() => {
-        fetch(`http://localhost:9090/connection`,
-            {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: { 'x-rh-identity':
-                    'eyJpZGVudGl0eSI6IHsiYWNjb3VudF9udW1iZXIiOiAiMDAwMDAwMSIsICJpbnRlcm5hbCI6IHsib3JnX2lkIjogIjAwMDAwMSJ9fX0='
-                }
-            }
-        )
+    const fetchData = () => {
+        fetch(`http://localhost:9090/connection`)
         .then(res => res.json())
         .then(response => {
-            setConnections(response.items);
+            setActiveConnections(Object.values(response.connections));
         })
         .catch(error => console.log(error));
-    });
+    };
 
-    console.log(connections);
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
-        <Table aria-label='Connections table' cells={ columns } rows={ rows }>
+        <Table
+            aria-label='Connections table'
+            cells={ [ 'Account', 'Number of Connections' ] }
+            rows={ activeConnections.map(conn => ({
+                cells: [
+                    { title: <Link to={ `connections/${conn.account}` }> { conn.account } </Link> },
+                    conn.connections.length
+                ]
+            })) }>
             <TableHeader />
             <TableBody />
         </Table>

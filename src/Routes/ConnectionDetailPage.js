@@ -7,6 +7,7 @@ import { Main, PageHeader, PageHeaderTitle } from '@redhat-cloud-services/fronte
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 
 import './ConnectionDetailPage.scss';
+import { ConnectionDetails } from '../Containers/ConnectionDetails';
 
 const ConnectionDetailPage = (props) => {
     console.log(props);
@@ -19,10 +20,10 @@ const ConnectionDetailPage = (props) => {
                     </BreadcrumbItem>
                     <BreadcrumbItem isActive> { props.match.params.id }</BreadcrumbItem>
                 </Breadcrumb>
-                <PageHeaderTitle title={ `Connection detail for ${props.match.params.id}` }/>
+                <PageHeaderTitle title={ `Active connections for account ${props.match.params.id}` }/>
             </PageHeader>
             <Main>
-                <span> { props.match.params.id } </span>
+                <ConnectionDetails id={ props.match.params.id } />
             </Main>
         </React.Fragment>
     );
