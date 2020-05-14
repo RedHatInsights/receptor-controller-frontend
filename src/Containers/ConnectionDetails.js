@@ -7,6 +7,7 @@ import {
     TableBody,
     cellWidth
 } from '@patternfly/react-table';
+import { red } from 'color-name';
 
 export const ConnectionDetails = (id) => {
     console.log(id);
@@ -27,12 +28,15 @@ export const ConnectionDetails = (id) => {
     //     });
     // };
 
+    const getStatusPlaceholder = () => {
+        setNodeStatus({ status: 'connected', capabilities: 'max_work_threads:12' });
+    };
+
     const getStatus = (data) => {
-        fetch(`http://localhost:9090/connection/status`, {
+        fetch(`http://localhost:8010/connection/status`, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
-                Accept: 'application/json',
+                Accept: 'application/json, text/plain, */*',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -40,13 +44,13 @@ export const ConnectionDetails = (id) => {
         .then(res => res.json())
         .then(response => {
             setNodeStatus(response);
-            console.log('RESPONSE: ', response);
+            console.log('NODE STATUS: ', nodeStatus);
         })
         .catch(error => console.log(error));
     };
 
     const fetchData = () => {
-        fetch(`http://localhost:9090/connection/${id.id}`)
+        fetch(`http://localhost:8010/proxy/connection/${id.id}`)
         .then(res => res.json())
         .then(response => {
             setAccountConnections(Object.values(response.connections));
@@ -56,27 +60,29 @@ export const ConnectionDetails = (id) => {
 
     useEffect(() => {
         fetchData();
+        getStatusPlaceholder();
         getStatus({ account: id.id, node_id: 'node-a' }); /*eslint-disable-line*/
     }, []);
-
-    console.log('NODE STATUS: ', nodeStatus);
 
     return (
         <React.Fragment >
             <Table
                 aria-label='Connection details table'
-                cells={ [ 'Node-ID',
+                cells={ [
+                    { title: 'Node-ID', transforms: [ cellWidth(25) ]},
                     { title: 'Status', transforms: [ cellWidth(25) ]},
                     { title: 'Capabilities', transforms: [ cellWidth(25) ]}] }
                 rows={ accountConnections.map(conn => ({
                     cells: [
                         conn,
-                        'connected',
-                        'max_work_threads: 12'
+                        nodeStatus.status,
+                        nodeStatus.capabilities
                     ]
                 })) }
                 actions={ [
-                    { title: 'Ping node', onClick: console.log('ping') }] }> {/*eslint-disable-line*/}
+                    { title: 'Ping node', onClick: console.log('ping') },
+                    { isSeparator: true },
+                    { title: 'Disconnect node', color: red, onClick: console.log('disconnect')}] }> {/*eslint-disable-line*/}
                 <TableHeader />
                 <TableBody />
             </Table>
