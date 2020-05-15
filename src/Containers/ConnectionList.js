@@ -14,7 +14,7 @@ export const ConnectionList = () => {
     }]);
 
     const fetchData = () => {
-        fetch(`http://localhost:8010/proxy/connection`)
+        fetch(`http://localhost:9001/connection`)
         .then(res => res.json())
         .then(response => {
             setActiveConnections(Object.values(response.connections));
