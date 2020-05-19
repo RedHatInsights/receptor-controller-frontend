@@ -1,9 +1,14 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 import { Routes } from './Routes';
+import { getRegistry } from '@redhat-cloud-services/frontend-components-utilities/files/Registry';
+import { NotificationsPortal, notifications } from '@redhat-cloud-services/frontend-components-notifications';
 import './App.scss';
+
+const registry = getRegistry();
+registry.register({ notifications });
 
 class App extends Component {
 
@@ -22,7 +27,12 @@ class App extends Component {
 
     render () {
         return (
-            <Routes childProps={ this.props } />
+            <Provider store={ registry.getStore() }>
+                <Fragment>
+                    <Routes childProps={ this.props } />
+                    <NotificationsPortal />
+                </Fragment>
+            </Provider>
         );
     }
 }

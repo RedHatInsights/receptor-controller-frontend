@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Alert } from '@patternfly/react-core';
+import { useDispatch } from 'react-redux';
+import { addNotification } from '@redhat-cloud-services/frontend-components-notifications';
 //import { Link } from 'react-router-dom';
 
 import {
@@ -15,8 +16,8 @@ export const ConnectionDetails = (id) => {
     const [ accountsLoaded, setAccountsLoaded ] = useState(false);
     const [ nodeStatus, setNodeStatus ] = useState({});
     const [ loadTable, setLoadTable ] = useState(false);
-    const [ pingAlert, setPingAlert ] = useState(false);
-    const [ disconnectAlert, setDisconnectAlert ] = useState(false);
+
+    const dispatch = useDispatch();
 
     const ping = (data) => {
         fetch(`http://localhost:9001/connection/ping`, {
@@ -26,6 +27,13 @@ export const ConnectionDetails = (id) => {
             },
             body: JSON.stringify(data)
         });
+
+        dispatch(
+            addNotification({
+                variant: 'success',
+                title: 'Sending Ping'
+            })
+        );
     };
 
     const disconnect = (data) => {
@@ -36,6 +44,13 @@ export const ConnectionDetails = (id) => {
             },
             body: JSON.stringify(data)
         });
+
+        dispatch(
+            addNotification({
+                variant: 'success',
+                title: 'Sending Disconnect'
+            })
+        );
     };
 
     async function getStatus(conn) {
@@ -102,16 +117,14 @@ export const ConnectionDetails = (id) => {
                         {
                             title: 'Ping node',
                             onClick: (event, rowId, rowData) => { {/*eslint-disable-line*/}
-                                ping({ account: id.id, node_id: rowData.type }), /*eslint-disable-line*/
-                                setPingAlert(true);
+                                ping({ account: id.id, node_id: rowData.type }) /*eslint-disable-line*/
                             }
                         },
                         { isSeparator: true },
                         {
                             title: 'Disconnect node',
                             onClick: (event, rowId, rowData) => { {/*eslint-disable-line*/}
-                                disconnect({ account: id.id, node_id: rowData.type }), /*eslint-disable-line*/
-                                setDisconnectAlert(true);
+                                disconnect({ account: id.id, node_id: rowData.type }) /*eslint-disable-line*/
                             }
                         }
                     ] }>
@@ -119,14 +132,6 @@ export const ConnectionDetails = (id) => {
                     <TableBody />
                 </Table>
                 : <div>loading...</div>
-            }
-            { pingAlert
-                ? <Alert variant="info" title="Sent Ping"/>
-                : null
-            }
-            { disconnectAlert
-                ? <Alert variant='info' title= 'Disconnected node'/>
-                : null
             }
         </React.Fragment>
     );
