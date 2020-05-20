@@ -1,9 +1,14 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 import { Routes } from './Routes';
+import { getRegistry } from '@redhat-cloud-services/frontend-components-utilities/files/Registry';
+import { NotificationsPortal, notifications } from '@redhat-cloud-services/frontend-components-notifications';
 import './App.scss';
+
+const registry = getRegistry();
+registry.register({ notifications });
 
 class App extends Component {
 
@@ -11,7 +16,7 @@ class App extends Component {
         insights.chrome.init();
         // TODO change this to your appname
         // TODO should the sample app webpack just rewrite this automatically?
-        insights.chrome.identifyApp('insights');
+        insights.chrome.identifyApp('rc-manager');
 
         this.appNav = insights.chrome.on('APP_NAVIGATION', event => this.props.history.push(`/${event.navId}`));
     }
@@ -22,7 +27,12 @@ class App extends Component {
 
     render () {
         return (
-            <Routes childProps={ this.props } />
+            <Provider store={ registry.getStore() }>
+                <Fragment>
+                    <Routes childProps={ this.props } />
+                    <NotificationsPortal />
+                </Fragment>
+            </Provider>
         );
     }
 }
