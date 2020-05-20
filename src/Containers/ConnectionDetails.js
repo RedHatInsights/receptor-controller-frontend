@@ -20,41 +20,83 @@ export const ConnectionDetails = (id) => {
     const dispatch = useDispatch();
 
     const ping = (data) => {
+        dispatch(
+            addNotification({
+                variant: 'info',
+                title: `Sending Ping to ${data.node_id}`
+            })
+        );
+
         fetch(`http://localhost:9001/connection/ping`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        });
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.status === 400) {
+                dispatch(
+                    addNotification({
+                        variant: 'danger',
+                        title: `${response.title} for ${data.node_id}`,
+                        description: `${response.detail}`
+                    })
+                );
+            }
+            else {
+                dispatch(
+                    addNotification({
+                        variant: 'success',
+                        title: `Ping sent to ${data.node_id}` // will add description once ping is updated in receptor
+                    })
+                );
+            }
+        })
+        .catch(error => console.log(error));
 
-        dispatch(
-            addNotification({
-                variant: 'success',
-                title: 'Sending Ping'
-            })
-        );
     };
 
     const disconnect = (data) => {
+        dispatch(
+            addNotification({
+                variant: 'info',
+                title: `Sending disconnect request to ${data.node_id}`
+            })
+        );
+
         fetch(`http://localhost:9001/connection/disconnect`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        });
-
-        dispatch(
-            addNotification({
-                variant: 'success',
-                title: 'Sending Disconnect'
-            })
-        );
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.status === 400) {
+                dispatch(
+                    addNotification({
+                        variant: 'danger',
+                        title: `${response.title} for ${data.node_id}`,
+                        description: `${response.detail}`
+                    })
+                );
+            }
+            else {
+                dispatch(
+                    addNotification({
+                        variant: 'success',
+                        title: `${data.node_id} disconnected`
+                    })
+                );
+            }
+        })
+        .catch(error => console.log(error));
     };
 
     async function getStatus(conn) {
-        console.log('GETTING STATUS FOR: ', conn);
         let response = await fetch(`http://localhost:9001/connection/status`, {
             method: 'POST',
             headers: {
@@ -91,7 +133,6 @@ export const ConnectionDetails = (id) => {
 
     useEffect(() => {
         if (Object.keys(nodeStatus).length >= accountConnections.length && accountConnections.length >= 1) {
-            console.log('apparently done loading');
             setLoadTable(true);
         }
     }, [ Object.keys(nodeStatus).length ]);
